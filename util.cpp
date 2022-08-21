@@ -84,7 +84,6 @@ Mac get_sender_mac(pcap_t* handle, Ip sender_ip, Ip attacker_ip, Mac attacker_ma
 		if(ethernet->type() != ethernet->Arp){
 			continue;
 		}
-		printf("[DEBUG] get_sender_mac() 1\n");
 		
 		packet += sizeof(EthHdr);
 		ArpHdr* arp = (ArpHdr*)packet;
